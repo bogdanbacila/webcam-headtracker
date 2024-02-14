@@ -11,7 +11,8 @@ setup(
         "numpy",
         "mediapipe",
         "click",
-        "opencv-python"
+        "opencv-python",
+        "python-osc"
     ],
     packages=find_namespace_packages(include='EACheadtracker.*'),
     package_data={}, # No data yet.

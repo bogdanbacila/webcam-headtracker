@@ -3,11 +3,11 @@ Head tracker via face landmarks recognition (Google's MediaPipe - face_mesh)
 
 '''
 import sys
-import socket
 import cv2
 import click
 import numpy as np
 import mediapipe as mp
+from pythonosc import udp_client
 from EACheadtracker.face_geometry import get_metric_landmarks, PCF, procrustes_landmark_basis
 
 
@@ -19,10 +19,11 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     """
     # Initialize UDP server ---------------------------------------------------------
     global rotation_vector, translation_vector
-    global s, IP, PORT
+    global client, IP, PORT
     IP = '127.0.0.1'  # Symbolic name meaning all available interfaces
     PORT = port       # Arbitrary non-privileged port
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    client = udp_client.SimpleUDPClient(IP, PORT)
 
     # OpenCV config -----------------------------------------------------------------
     frame_height, frame_width, _ = (height, width, 3)
@@ -173,7 +174,8 @@ def get_head_orientation():
 def send_to_server():
     try:
         coords, data = get_head_orientation()
-        s.sendto(coords.encode(), (IP, PORT))
+        # s.sendto(coords.encode(), (IP, PORT))
+        client.send_message("/headposition", data)
         return data
     except Exception:
         print('Sending UDP failed!')
@@ -193,5 +195,5 @@ if __name__ == "__main__":
     try:
         cmd_start()
     except:
-        start(0, 5555, 640, 420, 0)
+        start(0, 5555, 640, 480, 0)
 

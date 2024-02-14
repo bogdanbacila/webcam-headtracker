@@ -1,0 +1,5 @@
+numpy==1.26.4
+mediapipe==0.10.9
+click==8.1.7
+opencv-python==4.9.0.80
+python-osc==1.8.3
