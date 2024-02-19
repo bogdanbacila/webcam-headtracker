@@ -130,9 +130,12 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                 image = cv2.putText(image, str(coords[3:]), (00, 90), cv2.LINE_AA, 0.6,
                                     (0, 100, 200), 2, cv2.LINE_AA)
 
-            # Open window: show image
-            cv2.imshow(window_name, image)
-            cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
+            if coords is not None and not isCentred(coords):
+                # Open window: show image
+                cv2.imshow(window_name, image)
+                cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
+            else: 
+                cv2.destroyWindow(window_name)
 
             # Kill it when you press "Esc"
             if cv2.waitKey(5) & 0xFF == 27:
@@ -144,6 +147,17 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     cv2.destroyAllWindows()
     cap.release()
 
+
+def isCentred(data):
+
+    if (data[0] in range(-10, 11))\
+        and (data[1] in range(-10, 11))\
+        and (data[2] in range(-10, 11))\
+        and (data[3] in range(-10, 11))\
+        and (data[5] in range(-10, 11)):      
+        return True
+    else:
+        return False
 
 def get_head_orientation():
     rvec = rotation_vector
