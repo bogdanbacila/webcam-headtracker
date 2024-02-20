@@ -132,6 +132,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
 
             if coords is not None and not isCentred(coords):
                 # Open window: show image
+                image = drawCenteringArrows(image, coords, frame_width, frame_height)
                 cv2.imshow(window_name, image)
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             else: 
@@ -148,6 +149,19 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     cap.release()
 
 
+def drawCenteringArrows(image, data, width, height):
+    
+    if data[3]<-1:
+        image = cv2.arrowedLine(image, (250, int(height/2)),(400, int(height/2)), (0, 0, 255), 5) 
+    if data[3]>1:
+        image = cv2.arrowedLine(image, (int(width-250), int(height/2)),(int(width-400), int(height/2)), (0, 0, 255), 5) 
+    if data[5]<-1:
+        image = cv2.arrowedLine(image, (int(width/2), 40),(int(width/2), 140), (0, 0, 255), 5) 
+    if data[5]>1:
+        image = cv2.arrowedLine(image, (int(width/2), int(height-40)),(int(width/2), int(height-140)), (0, 0, 255), 5) 
+    
+    return image
+
 def isCentred(data):
 
     if (data[0] in range(-10, 11))\
@@ -155,7 +169,8 @@ def isCentred(data):
         and (data[2] in range(-10, 11))\
         and (data[3] in range(-10, 11))\
         and (data[5] in range(-10, 11)):      
-        return True
+        # return True
+        return False
     else:
         return False
 
