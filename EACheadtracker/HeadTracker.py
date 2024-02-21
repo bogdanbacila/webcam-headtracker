@@ -120,7 +120,8 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                     image = cv2.arrowedLine(image, p1, p2, (0, 0, 200), 2)
 
                 # UDP Listening to ports
-                coords = send_to_server()
+                coords = get_head_orientation()
+                send_to_server(coords)
                 coords = np.round(coords)
 
                 # Draw yaw, pitch and roll in the top left corner
@@ -195,17 +196,16 @@ def get_head_orientation():
     tx = tvec.item(0)
     ty = tvec.item(2)
     tz = tvec.item(1)
-    txt = f'{yaw},{pitch},{roll},{tx},{ty},{tz}'
+    # txt = f'{yaw},{pitch},{roll},{tx},{ty},{tz}'
     data = [yaw, pitch, roll, tx, ty, tz]
-    return txt, data
+    # return txt, data
+    return data
 
 
-def send_to_server():
+def send_to_server(data):
     try:
-        coords, data = get_head_orientation()
         # s.sendto(coords.encode(), (IP, PORT))
         client.send_message("/headposition", data)
-        return data
     except Exception:
         print('Sending UDP failed!')
 
