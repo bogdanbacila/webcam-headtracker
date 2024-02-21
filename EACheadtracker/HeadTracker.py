@@ -9,7 +9,7 @@ import numpy as np
 import mediapipe as mp
 from pythonosc import udp_client
 from EACheadtracker.face_geometry import get_metric_landmarks, PCF, procrustes_landmark_basis
-
+from picamera2 import Picamera2
 
 def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     """
@@ -27,12 +27,17 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
 
     # OpenCV config -----------------------------------------------------------------
     frame_height, frame_width, _ = (height, width, 3)
+    
     cap = cv2.VideoCapture(input_id)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
     _, image = cap.read()
     frame_height, frame_width, _ = image.shape
+
+    picam2 = Picamera2()
+    picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (frame_width, frame_height)}))
+    picam2.start()
 
     # cap.set(cv2.CAP_PROP_FPS, 120)
     # speed up initialization perception
@@ -67,11 +72,16 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # Live Tracking --------------------------------------------------------------------------
     with mp_face_mesh.FaceMesh(min_detection_confidence=0.5,
                                min_tracking_confidence=0.5) as face_mesh:
-        while cap.isOpened():
-            success, image = cap.read()
-            if not success:
-                print("Ignoring empty camera frame.")
-                continue
+        # while cap.isOpened():
+        #     success, image = cap.read()
+        #     if not success:
+        #         print("Ignoring empty camera frame.")
+        #         continue
+            
+        while True:
+            
+            image = picam2.capture_array() 
+
 
             # Flip image vertically if required
             if cam_rotation == 180:
@@ -147,7 +157,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                 break
     print('Goodbye!')
     cv2.destroyAllWindows()
-    cap.release()
+    # cap.release()
 
 
 def drawCenteringArrows(image, data, width, height):
