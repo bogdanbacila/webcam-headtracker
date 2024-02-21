@@ -28,12 +28,12 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # OpenCV config -----------------------------------------------------------------
     frame_height, frame_width, _ = (height, width, 3)
     
-    cap = cv2.VideoCapture(input_id)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
-    _, image = cap.read()
-    frame_height, frame_width, _ = image.shape
+    # cap = cv2.VideoCapture(input_id)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
+    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+    # _, image = cap.read()
+    # frame_height, frame_width, _ = image.shape
 
     picam2 = Picamera2()
     picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (frame_width, frame_height)}))
