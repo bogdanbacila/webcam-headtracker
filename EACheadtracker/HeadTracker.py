@@ -35,7 +35,10 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # _, image = cap.read()
     # frame_height, frame_width, _ = image.shape
 
+    cv2.startWindowThread()
+
     picam2 = Picamera2()
+    picam2.video_configuration.controls.FrameRate = 30.0
     picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (frame_width, frame_height)}))
     picam2.start()
 
@@ -68,6 +71,8 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     pcf = PCF(near=1, far=10000, frame_height=frame_height, frame_width=frame_width, fy=camera_matrix[1, 1])
     mp_face_mesh = mp.solutions.face_mesh
     # mp_drawing = mp.solutions.drawing_utils  # use mediapipe internal drawings
+
+    coords = [0, 0, 0, 0, 0, 0]
 
     # Live Tracking --------------------------------------------------------------------------
     with mp_face_mesh.FaceMesh(min_detection_confidence=0.5,
@@ -131,8 +136,9 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
 
                 # UDP Listening to ports
                 coords = get_head_orientation()
-                send_to_server(coords)
+                # send_to_server(coords)
                 coords = np.round(coords)
+                # print(coords)
 
                 # Draw yaw, pitch and roll in the top left corner
                 image = cv2.putText(image, str(coords[:3]), (00, 30), cv2.LINE_AA, 0.6,
@@ -148,6 +154,9 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             else: 
                 cv2.destroyWindow(window_name)
+            
+            # image = drawCenteringArrows(image, coords, frame_width, frame_height)
+            # cv2.imshow(window_name, image)
 
             # Kill it when you press "Esc"
             if cv2.waitKey(5) & 0xFF == 27:
