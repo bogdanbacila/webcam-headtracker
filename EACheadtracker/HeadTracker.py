@@ -154,11 +154,9 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                 cv2.imshow(window_name, image)
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             else: 
-                cv2.destroyWindow(window_name)
+                cv2.imshow(window_name, blank_image)
+                cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             
-            # image = drawCenteringArrows(image, coords, frame_width, frame_height)
-            # cv2.imshow(window_name, image)
-
             # Kill it when you press "Esc"
             if cv2.waitKey(5) & 0xFF == 27:
                 break
