@@ -37,6 +37,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # cap.set(cv2.CAP_PROP_FPS, 120)
     # speed up initialization perception
     image = np.zeros((frame_height, frame_width))
+    blank_image = np.zeros((frame_height, frame_width))
     window_name = f'Head tracker -- [IP:{IP}, PORT:{PORT}]'  # Window name
     cv2.imshow(window_name, image)
     cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
@@ -63,7 +64,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     pcf = PCF(near=1, far=10000, frame_height=frame_height, frame_width=frame_width, fy=camera_matrix[1, 1])
     mp_face_mesh = mp.solutions.face_mesh
     # mp_drawing = mp.solutions.drawing_utils  # use mediapipe internal drawings
-
+    coords = [0,0,0,0,0,0]
     # Live Tracking --------------------------------------------------------------------------
     with mp_face_mesh.FaceMesh(min_detection_confidence=0.5,
                                min_tracking_confidence=0.5) as face_mesh:
@@ -137,7 +138,8 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                 cv2.imshow(window_name, image)
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             else: 
-                cv2.destroyWindow(window_name)
+                cv2.imshow(window_name, blank_image)
+                cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
 
             # Kill it when you press "Esc"
             if cv2.waitKey(5) & 0xFF == 27:
@@ -170,8 +172,8 @@ def isCentred(data):
         and (data[2] in range(-10, 11))\
         and (data[3] in range(-10, 11))\
         and (data[5] in range(-10, 11)):      
-        # return True
-        return False
+        return True
+        # return False
     else:
         return False
 
