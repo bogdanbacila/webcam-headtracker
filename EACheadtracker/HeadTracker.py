@@ -55,7 +55,8 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     points_idx.sort()
     # pseudo camera internals
     focal_length = frame_width
-    center = (frame_width / 2, frame_height / 2)
+    center_offset = (-40, -40)
+    center = (int(frame_width / 2 + center_offset[0]),int(frame_height / 2 + center_offset[1]))
     camera_matrix = np.array([[focal_length, 0, center[0]],
                               [0, focal_length, center[1]],
                               [0, 0, 1]], dtype="double")
@@ -120,6 +121,8 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
 
                     image = cv2.arrowedLine(image, p1, p2, (0, 0, 200), 2)
 
+                image = cv2.circle(image, center, 6, (0, 0, 255), -1)
+
                 # UDP Listening to ports
                 coords = get_head_orientation()
                 send_to_server(coords)
@@ -134,7 +137,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
 
             if coords is not None and not isCentred(coords):
                 # Open window: show image
-                image = drawCenteringArrows(image, coords, frame_width, frame_height)
+                image = drawCenteringArrows(image, coords, center)
                 cv2.imshow(window_name, image)
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             else: 
@@ -152,16 +155,16 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     cap.release()
 
 
-def drawCenteringArrows(image, data, width, height):
+def drawCenteringArrows(image, data, center):
     
     if data[3]<-1:
-        image = cv2.arrowedLine(image, (250, int(height/2)),(400, int(height/2)), (0, 0, 255), 5) 
+        image = cv2.arrowedLine(image, (center[0]-250, center[1]),(center[0]-150, center[1]), (0, 0, 255), 5) 
     if data[3]>1:
-        image = cv2.arrowedLine(image, (int(width-250), int(height/2)),(int(width-400), int(height/2)), (0, 0, 255), 5) 
+        image = cv2.arrowedLine(image, (center[0]+250, center[1]),(center[0]+150, center[1]), (0, 0, 255), 5) 
     if data[5]<-1:
-        image = cv2.arrowedLine(image, (int(width/2), 40),(int(width/2), 140), (0, 0, 255), 5) 
+        image = cv2.arrowedLine(image, (center[0], center[1]-200),(center[0], center[1]-100), (0, 0, 255), 5) 
     if data[5]>1:
-        image = cv2.arrowedLine(image, (int(width/2), int(height-40)),(int(width/2), int(height-140)), (0, 0, 255), 5) 
+        image = cv2.arrowedLine(image, (center[0], center[1]+200),(center[0], center[1]+100), (0, 0, 255), 5) 
     
     return image
 
