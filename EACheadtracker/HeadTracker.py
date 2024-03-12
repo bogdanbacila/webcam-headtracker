@@ -55,7 +55,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     points_idx.sort()
     # pseudo camera internals
     focal_length = frame_width
-    center_offset = (-40, -40)
+    center_offset = (-40, 0)
     center = (int(frame_width / 2 + center_offset[0]),int(frame_height / 2 + center_offset[1]))
     camera_matrix = np.array([[focal_length, 0, center[0]],
                               [0, focal_length, center[1]],
@@ -135,12 +135,13 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                 image = cv2.putText(image, str(coords[3:]), (00, 90), cv2.LINE_AA, 0.6,
                                     (0, 100, 200), 2, cv2.LINE_AA)
 
-            if coords is not None and not isCentred(coords):
+            if coords is not None and not isCentred(coords, 5):
                 # Open window: show image
-                image = drawCenteringArrows(image, coords, center)
+                image = drawCenteringArrows(image, coords, center, 5)
                 cv2.imshow(window_name, image)
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
             else: 
+                # blank_image = drawCenteringArrows(blank_image, coords, center, 2)
                 cv2.imshow(window_name, blank_image)
                 cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
 
@@ -155,26 +156,53 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     cap.release()
 
 
-def drawCenteringArrows(image, data, center):
+def drawCenteringArrows(image, data, center, limit = 5):
     
-    if data[3]<-1:
+    if data[3]<-limit:
         image = cv2.arrowedLine(image, (center[0]-250, center[1]),(center[0]-150, center[1]), (0, 0, 255), 5) 
-    if data[3]>1:
+        image = cv2.putText(image, "Move Right", (center[0]-250, center[1]-15), cv2.LINE_AA, 0.6,
+                                    (0, 0, 255), 2, cv2.LINE_AA)
+    if data[3]>limit:
         image = cv2.arrowedLine(image, (center[0]+250, center[1]),(center[0]+150, center[1]), (0, 0, 255), 5) 
-    if data[5]<-1:
-        image = cv2.arrowedLine(image, (center[0], center[1]-200),(center[0], center[1]-100), (0, 0, 255), 5) 
-    if data[5]>1:
-        image = cv2.arrowedLine(image, (center[0], center[1]+200),(center[0], center[1]+100), (0, 0, 255), 5) 
+        image = cv2.putText(image, "Move Left", (center[0]+160, center[1]-15), cv2.LINE_AA, 0.6,
+                                    (0, 0, 255), 2, cv2.LINE_AA)
+    if data[0]<-limit:
+        image = cv2.arrowedLine(image, (center[0]-250, center[1]),(center[0]-150, center[1]), (0, 165, 255), 5) 
+        image = cv2.putText(image, "Rotate Right", (center[0]-250, center[1]+25), cv2.LINE_AA, 0.6,
+                                    (0, 165, 255), 2, cv2.LINE_AA)
+    if data[0]>limit:
+        image = cv2.arrowedLine(image, (center[0]+250, center[1]),(center[0]+150, center[1]), (0, 165, 255), 5) 
+        image = cv2.putText(image, "Rotate Left", (center[0]+160, center[1]+25), cv2.LINE_AA, 0.6,
+                                    (0, 165, 255), 2, cv2.LINE_AA)
+        
     
+    if data[5]<-limit:
+        image = cv2.arrowedLine(image, (center[0], center[1]-200),(center[0], center[1]-100), (0, 0, 255), 5) 
+        image = cv2.putText(image, "Move Down", (center[0]-120, center[1]-150), cv2.LINE_AA, 0.6,
+                                    (0, 0, 255), 2, cv2.LINE_AA)
+    if data[5]>limit:
+        image = cv2.arrowedLine(image, (center[0], center[1]+200),(center[0], center[1]+100), (0, 0, 255), 5) 
+        image = cv2.putText(image, "Move Up", (center[0]-100, center[1]+150), cv2.LINE_AA, 0.6,
+                                    (0, 0, 255), 2, cv2.LINE_AA)
+    if data[1]<-limit:
+        image = cv2.arrowedLine(image, (center[0], center[1]+200),(center[0], center[1]+100), (0, 165, 255), 5) 
+        image = cv2.putText(image, "Rotate Up", (center[0]+10, center[1]+150), cv2.LINE_AA, 0.6,
+                                    (0, 165, 255), 2, cv2.LINE_AA)
+    if data[1]>limit:
+        image = cv2.arrowedLine(image, (center[0], center[1]-200),(center[0], center[1]-100), (0, 165, 255), 5) 
+        image = cv2.putText(image, "Rotate Down", (center[0]+10, center[1]-150), cv2.LINE_AA, 0.6,
+                                    (0, 165, 255), 2, cv2.LINE_AA)
+    
+
     return image
 
-def isCentred(data):
+def isCentred(data, limit =  5):
 
-    if (data[0] in range(-10, 11))\
-        and (data[1] in range(-10, 11))\
-        and (data[2] in range(-10, 11))\
-        and (data[3] in range(-10, 11))\
-        and (data[5] in range(-10, 11)):      
+    if (data[0] in range(-limit, limit+1))\
+        and (data[1] in range(-limit, limit+1))\
+        and (data[2] in range(-limit, limit+1))\
+        and (data[3] in range(-limit, limit+1))\
+        and (data[5] in range(-limit, limit+1)):      
         return True
         # return False
     else:
