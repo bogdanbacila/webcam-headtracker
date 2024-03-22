@@ -44,12 +44,12 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # OpenCV config -----------------------------------------------------------------
     frame_height, frame_width, _ = (height, width, 3)
     
-    # cap = cv2.VideoCapture(input_id)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
-    # _, image = cap.read()
-    # frame_height, frame_width, _ = image.shape
+    cap = cv2.VideoCapture(input_id)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+    _, image = cap.read()
+    frame_height, frame_width, _ = image.shape
 
     cv2.startWindowThread()
 
