@@ -72,7 +72,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     window_name = f'Head tracker -- [IP:{IP}, PORT:{PORT}]'  # Window name
     cv2.namedWindow(window_name, flags=cv2.WINDOW_GUI_NORMAL)
     cv2.setMouseCallback(window_name,process_click)
-    # cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
     cv2.imshow(window_name, image)
 
     
