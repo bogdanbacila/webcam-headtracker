@@ -12,12 +12,10 @@ from EACheadtracker.face_geometry import get_metric_landmarks, PCF, procrustes_l
 from picamera2 import Picamera2
 
 
-# button dimensions (y1,y2,x1,x2)
-button = [120,160,10,130]
-flag_center = 0
 # function that handles the mousclicks
 def process_click(event, x, y, flags, params):
     global flag_center
+    global button
     # check if the click is within the dimensions of the button
     if event == cv2.EVENT_LBUTTONDOWN:
         if y > button[0] and y < button[1] and x > button[2] and x < button[3]:   
@@ -36,6 +34,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     global rotation_vector, translation_vector
     global client, IP, PORT
     global flag_center
+    global button
     IP = '127.0.0.1'  # Symbolic name meaning all available interfaces
     PORT = port       # Arbitrary non-privileged port
     # s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -57,6 +56,10 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     picam2.video_configuration.controls.FrameRate = 30.0
     picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (frame_width, frame_height)}))
     picam2.start()
+
+    # button dimensions (y1,y2,x1,x2)
+    button = [20,60,frame_width - 140, frame_width - 20]
+    flag_center = 0
 
     # Button test
     exit_flag = False
@@ -218,39 +221,39 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # cap.release()
 
 
-def drawCenteringArrows(image, data, center, limit = 5):
+def drawCenteringArrows(image, data, center, limit_rot = 5, limit_trans = 5):
     
-    if data[3]<-limit:
+    if data[3]<-limit_trans:
         image = cv2.arrowedLine(image, (center[0]-250, center[1]),(center[0]-150, center[1]), (0, 0, 255), 5) 
         image = cv2.putText(image, "Move Right", (center[0]-250, center[1]-15), cv2.LINE_AA, 0.6,
                                     (0, 0, 255), 2, cv2.LINE_AA)
-    if data[3]>limit:
+    if data[3]>limit_trans:
         image = cv2.arrowedLine(image, (center[0]+250, center[1]),(center[0]+150, center[1]), (0, 0, 255), 5) 
         image = cv2.putText(image, "Move Left", (center[0]+160, center[1]-15), cv2.LINE_AA, 0.6,
                                     (0, 0, 255), 2, cv2.LINE_AA)
-    if data[0]<-limit:
+    if data[0]<-limit_rot:
         image = cv2.arrowedLine(image, (center[0]-250, center[1]),(center[0]-150, center[1]), (0, 165, 255), 5) 
         image = cv2.putText(image, "Rotate Right", (center[0]-250, center[1]+25), cv2.LINE_AA, 0.6,
                                     (0, 165, 255), 2, cv2.LINE_AA)
-    if data[0]>limit:
+    if data[0]>limit_rot:
         image = cv2.arrowedLine(image, (center[0]+250, center[1]),(center[0]+150, center[1]), (0, 165, 255), 5) 
         image = cv2.putText(image, "Rotate Left", (center[0]+160, center[1]+25), cv2.LINE_AA, 0.6,
                                     (0, 165, 255), 2, cv2.LINE_AA)
         
     
-    if data[5]<-limit:
+    if data[5]<-limit_trans:
         image = cv2.arrowedLine(image, (center[0], center[1]-200),(center[0], center[1]-100), (0, 0, 255), 5) 
         image = cv2.putText(image, "Move Down", (center[0]-120, center[1]-150), cv2.LINE_AA, 0.6,
                                     (0, 0, 255), 2, cv2.LINE_AA)
-    if data[5]>limit:
+    if data[5]>limit_trans:
         image = cv2.arrowedLine(image, (center[0], center[1]+200),(center[0], center[1]+100), (0, 0, 255), 5) 
         image = cv2.putText(image, "Move Up", (center[0]-100, center[1]+150), cv2.LINE_AA, 0.6,
                                     (0, 0, 255), 2, cv2.LINE_AA)
-    if data[1]<-limit:
+    if data[1]<-limit_rot:
         image = cv2.arrowedLine(image, (center[0], center[1]+200),(center[0], center[1]+100), (0, 165, 255), 5) 
         image = cv2.putText(image, "Rotate Up", (center[0]+10, center[1]+150), cv2.LINE_AA, 0.6,
                                     (0, 165, 255), 2, cv2.LINE_AA)
-    if data[1]>limit:
+    if data[1]>limit_rot:
         image = cv2.arrowedLine(image, (center[0], center[1]-200),(center[0], center[1]-100), (0, 165, 255), 5) 
         image = cv2.putText(image, "Rotate Down", (center[0]+10, center[1]-150), cv2.LINE_AA, 0.6,
                                     (0, 165, 255), 2, cv2.LINE_AA)
@@ -258,13 +261,13 @@ def drawCenteringArrows(image, data, center, limit = 5):
 
     return image
 
-def isCentred(data, limit =  5):
+def isCentred(data, limit_rot =  5, limit_trans = 5):
 
-    if (data[0] in range(-limit, limit+1))\
-        and (data[1] in range(-limit, limit+1))\
-        and (data[2] in range(-limit, limit+1))\
-        and (data[3] in range(-limit, limit+1))\
-        and (data[5] in range(-limit, limit+1)):      
+    if (data[0] in range(-limit_rot, limit_rot+1))\
+        and (data[1] in range(-limit_rot, limit_rot+1))\
+        and (data[2] in range(-limit_rot, limit_rot+1))\
+        and (data[3] in range(-limit_trans, limit_trans+1))\
+        and (data[5] in range(-limit_trans, limit_trans+1)):      
         return True
         # return False
     else:
