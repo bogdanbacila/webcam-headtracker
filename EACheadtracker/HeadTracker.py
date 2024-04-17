@@ -221,7 +221,7 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
     # cap.release()
 
 
-def drawCenteringArrows(image, data, center, limit_rot = 5, limit_trans = 5):
+def drawCenteringArrows(image, data, center, limit_rot = 10, limit_trans = 5):
     
     if data[3]<-limit_trans:
         image = cv2.arrowedLine(image, (center[0]-250, center[1]),(center[0]-150, center[1]), (0, 0, 255), 5) 
@@ -261,7 +261,7 @@ def drawCenteringArrows(image, data, center, limit_rot = 5, limit_trans = 5):
 
     return image
 
-def isCentred(data, limit_rot =  5, limit_trans = 5):
+def isCentred(data, limit_rot =  10, limit_trans = 5):
 
     if (data[0] in range(-limit_rot, limit_rot+1))\
         and (data[1] in range(-limit_rot, limit_rot+1))\
