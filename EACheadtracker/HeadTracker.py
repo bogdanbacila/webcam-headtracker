@@ -196,9 +196,9 @@ def start(input_id=0, port=5555, width=640, height=480, cam_rotation=0):
                     image = cv2.putText(image, str(coords[3:]), (00, 90), cv2.LINE_AA, 0.6,
                                         (0, 100, 200), 2, cv2.LINE_AA)
 
-                if coords is not None and not isCentred(coords, 5):
+                if coords is not None and not isCentred(coords, 10, 5):
                     # Open window: show image
-                    image = drawCenteringArrows(image, coords, center, 5)
+                    image = drawCenteringArrows(image, coords, center, 10, 5)
                     cv2.imshow(window_name, image)
                     # cv2.setWindowProperty(window_name, cv2.WND_PROP_TOPMOST, 1)
                 else: 
@@ -261,7 +261,7 @@ def drawCenteringArrows(image, data, center, limit_rot = 10, limit_trans = 5):
 
     return image
 
-def isCentred(data, limit_rot =  10, limit_trans = 5):
+def isCentred(data, limit_rot = 10, limit_trans = 5):
 
     if (data[0] in range(-limit_rot, limit_rot+1))\
         and (data[1] in range(-limit_rot, limit_rot+1))\
