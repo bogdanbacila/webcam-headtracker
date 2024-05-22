@@ -138,3 +138,4 @@ src/dep
 *.rar
 *.pyc 
 *.ico
+.DS_Store
